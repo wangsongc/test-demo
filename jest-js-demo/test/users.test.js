@@ -5,14 +5,14 @@ import Users from '../src/users';
 jest.mock('axios');
 
 test('should fetch users', () => {
-  const users = [{name: 'Bob'}];
-  const resp = {data: users};
-  axios.get.mockResolvedValue(resp);
+    const users = [{ name: 'Bob' }];
+    const resp = { data: users };
+    axios.get.mockResolvedValue(resp);
 
-  // or you could use the following depending on your use case:
-  // axios.get.mockImplementation(() => Promise.resolve(resp))
+    // or you could use the following depending on your use case:
+    // axios.get.mockImplementation(() => Promise.resolve(resp))
 
-  return Users.all().then(data => expect(data).toEqual(users));
+    return Users.all().then(data => expect(data).toEqual(users));
 });
 
 //mock实现
@@ -22,17 +22,17 @@ const foo = require('../src/foo');
 
 // foo is a mock function
 foo.mockImplementation(() => 42);
-test('mockImplementation',()=>{
+test('mockImplementation', () => {
     expect(foo()).toBe(42)
 })
 
 //利用mockImplementationOnce等可以使每次调用产生预期的值
 {
     const myMockFn = jest
-    .fn(() => 'default')
-    .mockImplementationOnce(() => 'first call')
-    .mockImplementationOnce(() => 'second call');
-  
-  console.log(myMockFn(), myMockFn(), myMockFn(), myMockFn());
-  // > 'first call', 'second call', 'default', 'default'
+        .fn(() => 'default')
+        .mockImplementationOnce(() => 'first call')
+        .mockImplementationOnce(() => 'second call');
+
+    console.log(myMockFn(), myMockFn(), myMockFn(), myMockFn());
+    // > 'first call', 'second call', 'default', 'default'
 }

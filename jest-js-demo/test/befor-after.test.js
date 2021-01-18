@@ -8,7 +8,7 @@ function clearCityDatabase() {
 }
 
 function isCity(city) {
-    for (item in cities) {
+    for (let item in cities) {
         if (cities[item] == city) {
             return true
         }

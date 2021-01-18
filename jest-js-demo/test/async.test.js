@@ -1,7 +1,12 @@
 //问题:一旦fetchData完成，测试也就执行完成，然后再调用回调(callback是否被调用无法判断)
+// let callback = (data)=>{
+//     console.log(data)
+// }
+// let data = 'peanut butter'
 function fetchData(callback) {
     let data = 'peanut butter'
-    setTimeout(callback(data), 3000)
+    setTimeout(() => { callback(data) }, 3000)
+    // setTimeout(callback, 3000)
 }
 test('the data is peanut butter', () => {
     function callback(data) {
@@ -28,7 +33,7 @@ test('the data is peanut butter', done => {
 
 function division(a, b) {
     return new Promise(function (resolve, reject) {
-        if (b == 0){
+        if (b == 0) {
             reject("Diveide zero");
         } else {
             resolve(a / b);
@@ -36,9 +41,10 @@ function division(a, b) {
     }).then(function (value) {
         return value
     }).catch(function (err) {  //如果被测代码中已经catch，则在测试中可能获取不到错误信息
-        throw new Error(err+'!')
+        throw new Error(err + '!')
     }).finally(function () {
-        return value = 'end'
+        let endvalue = 'end'
+        return endvalue
         //console.log("End");
     });
 }
@@ -84,7 +90,7 @@ describe('Async/Await', () => {
         const data = await division(a, b);
         expect(data).toBe(0.5);
     });
-//源码中err被catch
+    //源码中err被catch
     // test('the fetch fails with an error', async () => {
     //     let a = 1;
     //     let b = 0;
