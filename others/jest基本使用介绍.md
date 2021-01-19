@@ -132,7 +132,7 @@ test('adding floating point numbers', () => {
 
 #### 字符串匹配器
 
-您可以使用toMatch对正则表达式进行字符串检查
+- 使用`toMatch`对正则表达式进行字符串检查
 
 ```
 test('there is no I in team', () => {
@@ -146,7 +146,7 @@ test('but there is a "stop" in Christoph', () => {
 
 #### 数组匹配器
 
-您可以使用以下命令检查数组或可迭代项是否包含特定项目`toContain`
+- 使用`toContain`检查数组或可迭代项是否包含特定项目
 
 ```
 const shoppingList = [
@@ -165,7 +165,7 @@ test('the shopping list has milk on it', () => {
 
 #### 异常匹配器
 
-如果要测试特定函数在调用时是否引发错误，请使用`toThrow`
+- 使用`toThrow`测试特定函数在调用时是否引发错误
 
 ```
 function compileAndroidCode() {
@@ -299,11 +299,11 @@ test('the fetch fails with an error', async () => {
 
 
 
-### Setup and Teardown
+### 钩子函数
 
 通常在编写测试时，您需要在测试运行之前进行一些设置工作，而在测试运行后需要进行一些整理工作。Jest提供了辅助功能来处理此问题。
 
-#### 对许多测试重复设置
+#### `beforeEach`和`afterEach`
 
 如果有很多测试用例执行前后有相同的设置，则可以使用`beforeEach`和`afterEach`。
 
@@ -327,7 +327,7 @@ test('city database has San Juan', () => {
 });
 ```
 
-#### 一次性设置
+#### `beforeAll`和`afterAll`
 
 在某些情况下，您只需要在文件开头执行一次设置即可。当设置是异步的时，这尤其麻烦，因此您不能内联。jest提供`beforeAll`并`afterAll`处理这种情况。
 
@@ -351,9 +351,13 @@ test('city database has San Juan', () => {
 });
 ```
 
-#### 范围界定
+#### **钩子函数的作用域**
 
 默认情况下，`before`和`after`块适用于文件中的每个测试。您也可以使用`describe`块将测试分组在一起。当它们在一个`describe`块内时，`before`和`after`块仅适用于该`describe`块内的测试。
+
+- 钩子函数在父级分组可作用域子集，类似继承
+- 钩子函数同级分组作用域互不干扰，各起作用
+- 先执行外部的钩子函数，再执行内部的钩子函数
 
 ```
 // Applies to all tests in this file
@@ -700,3 +704,223 @@ expect(mockFunc.getMockName()).toBe('a mock name');
 ### 配置jest
 
 https://www.jestjs.cn/docs/configuration
+
+
+
+### 测试框架引入遇到的问题
+
+#### 解决md导入的问题
+
+```
+    D:\work\songwang\mavonEditor\src\lib\lang\zh-CN\help_zh-CN.md:1
+    ({"Object.<anonymous>":function(module,exports,require,__dirname,__filename,global,jest){@[toc](目录)
+                                                                                             ^
+
+    SyntaxError: Invalid or unexpected token
+
+      11 |  */
+      12 | 
+    > 13 | import help_zh_CN from './lang/zh-CN/help_zh-CN.md'
+         | ^
+      14 | import help_zh_TW from './lang/zh-TW/help_zh-TW.md'
+      15 | import help_en from './lang/en/help_en.md'
+      16 | import help_fr from './lang/fr/help_fr.md'
+
+      at ScriptTransformer._transformAndBuildScript (node_modules/jest-runtime/build/script_transformer.js:403:17)
+      at Object.<anonymous> (src/lib/config.js:13:1)
+```
+
+- 解决办法：
+
+```
+transform: {
+    "^.+\\.js$": "<rootDir>/node_modules/babel-jest",
+    "^.+\\.vue$": "<rootDir>/node_modules/vue-jest",
+    // "^.+\\.(md|mdx)$": "jest-transformer-mdx",
+    '.*\\.(yml|html|md)$': 'jest-raw-loader'  //解决md导入的问题
+  }
+```
+
+#### 解决外部module引入问题
+
+无法引入外部模块auto-textarea
+
+- 解决办法：
+
+```
+transformIgnorePatterns: ["<rootDir>/node_modules/(?!auto-textarea|@vue|src)"],
+```
+
+
+
+#### 解析markdown失败
+
+```
+    D:/work/songwang/mavonEditor/src/lib/lang/zh-CN/help_zh-CN.md: Unexpected token (14:9)
+
+      Jest encountered an unexpected token
+      This usually means that you are trying to import a file which Jest cannot parse, e.g. it's not plain JavaScript.
+      By default, if Jest sees a Babel config, it will use that to transform your files, ignoring "node_modules".
+      Here's what you can do:
+       • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config. 
+       • If you need a custom transformation specify a "transform" option in your config.
+       • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+      You'll find more details and examples of these config options in the docs:
+      https://jestjs.io/docs/en/configuration.html
+      Details:
+        12 |   ...props
+        13 | }) {
+      > 14 |   return <MDXLayout {...layoutProps} {...props} components={components} mdxType="MDXLayout">
+           |          ^
+        15 | 
+        16 |     <h1>{`Markdown 语法简介`}</h1>
+        17 |     <blockquote>
+
+Test Suites: 1 failed, 1 total
+```
+
+- 解决方法：
+
+使用`"^.+\\.(md|mdx)$": "jest-transformer-mdx",`无法解决，正确解决方式如下：
+
+```
+transform: {
+    "^.+\\.js$": "<rootDir>/node_modules/babel-jest",
+    "^.+\\.vue$": "<rootDir>/node_modules/vue-jest",
+    // "^.+\\.(md|mdx)$": "jest-transformer-mdx",
+    '.*\\.(yml|html|md)$': 'jest-raw-loader'  //解决md导入的问题
+  }
+```
+
+
+
+#### 引入css文件失败
+
+```
+    D:\work\songwang\mavonEditor\src\lib\font\css\fontello.css:1
+    ({"Object.<anonymous>":function(module,exports,require,__dirname,__filename,global,jest){@font-face {
+                                                                                             ^
+
+    SyntaxError: Invalid or unexpected token
+
+      120 | import md_toolbar_left from './components/md-toolbar-left.vue'
+      121 | import md_toolbar_right from './components/md-toolbar-right.vue'
+    > 122 | import "./lib/font/css/fontello.css"
+          | ^
+      123 | import './lib/css/md.css'
+      124 | export default {
+      125 |     mixins: [markdown],
+
+      at ScriptTransformer._transformAndBuildScript (node_modules/jest-runtime/build/script_transformer.js:403:17)
+      at src/mavon-editor.vue:122:1
+      at Object.<anonymous> (src/mavon-editor.vue:633:3)
+```
+
+- 解决办法：
+
+```
+moduleNameMapper: {
+    '\\.(css|scss)$': 'identity-obj-proxy', //解决css引入失败
+    '^@/(.*)$': '<rootDir>/src/$1'
+  },
+```
+
+
+
+#### TypeError: Cannot read property 'focus' of undefined
+
+```
+    × renders props.msg when passed (268ms)
+
+  ● MdToolbarLeft.vue › renders props.msg when passed   
+
+    TypeError: Cannot read property 'focus' of undefined
+
+      335 |         // 设置默认焦点
+      336 |         if (this.autofocus) {
+    > 337 |             this.getTextareaDom().focus();
+          | ^
+      338 |         }
+      339 |         // fullscreen事件
+      340 |         fullscreenchange(this);
+
+      at VueComponent.mounted (src/mavon-editor.vue:337:1)
+      at invokeWithErrorHandling (node_modules/vue/dist/vue.runtime.common.dev.js:1850:57)
+      at callHook (node_modules/vue/dist/vue.runtime.common.dev.js:4207:7)
+      at Object.insert (node_modules/vue/dist/vue.runtime.common.dev.js:3133:7)
+      at invokeInsertHook (node_modules/vue/dist/vue.runtime.common.dev.js:6326:28)
+      at VueComponent.patch [as __patch__] (node_modules/vue/dist/vue.runtime.common.dev.js:6543:5)
+      at VueComponent.Vue._update (node_modules/vue/dist/vue.runtime.common.dev.js:3933:19)
+      at VueComponent.updateComponent (node_modules/vue/dist/vue.runtime.common.dev.js:4054:10)
+      at Watcher.get (node_modules/vue/dist/vue.runtime.common.dev.js:4465:25)
+      at new Watcher (node_modules/vue/dist/vue.runtime.common.dev.js:4454:12)
+      at mountComponent (node_modules/vue/dist/vue.runtime.common.dev.js:4061:3)
+      at VueComponent.$mount (node_modules/vue/dist/vue.runtime.common.dev.js:8392:10)
+      at mount (node_modules/@vue/test-utils/dist/vue-test-utils.js:13991:21)
+      at shallowMount (node_modules/@vue/test-utils/dist/vue-test-utils.js:14017:10)
+      at Object.<anonymous> (tests/unit/md-toolbar-left.spec.js:6:21)
+```
+
+- 解决办法：
+
+增加nextTick()
+
+```
+if (this.autofocus) {
+            this.$nextTick(function () { this.getTextareaDom().focus(); });
+            
+        }
+```
+
+
+
+#### 对带有空格的class取元素需将空格替换成`.`导入外部module（autotext）在测试时渲染失败
+
+```
+    [Vue warn]: Failed to mount component: template or render function not defined.
+    
+    found in
+    
+    ---> <VAutoTextarea>
+           <Anonymous>
+             <Root>
+```
+
+- 解决方法：
+
+1.修改源码，将auto-textarea由`import {autoTextarea} from 'auto-textarea'`改为`import autoTextarea from 'auto-textarea/auto-textarea.vue' `
+
+2.使用vue-test-util的stub选项将auto-textarea组件替换引入加载
+
+```javascript
+describe('xxxx', () => {
+  test("xxxxxtest",()=>{
+    let w =  mount(MavonEditor,{
+      stubs:{
+        "v-autoTextarea":autoTextarea
+      }
+    })
+  }) 
+});
+```
+
+
+
+#### 出现Error: Not implemented: window.alert错误
+
+```
+  console.error node_modules/jest-environment-jsdom/node_modules/jsdom/lib/jsdom/virtual-console.js:29
+      Error: Not implemented: window.alert
+```
+
+- 解决方法：
+
+`window.alert`以及其他一些特定于浏览器的副作用，需要手动添加。最好使用Jest完成此操作，以便可以跟踪并清理间谍：
+
+```
+jest.spyOn(window, 'alert').mockReturnValue();
+```
+
+
+
+
