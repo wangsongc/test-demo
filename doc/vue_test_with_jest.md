@@ -3,7 +3,7 @@
 
 ## 前言 
 
-关于web 应用前端测试主要有三大类：
+关于vue应用前端测试主要有三大类：
 
 - 单元测试
 - 组件测试
@@ -395,3 +395,8 @@ Ran all test suites.
 ```
 
  `coverage` 目录，浏览器打开里面的 `index.html` 查看覆盖率信息。
+
+ ### 示例工程
+https://github.com/lmiller1990/vue-testing-handbook
+
+

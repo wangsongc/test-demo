@@ -705,6 +705,9 @@ expect(mockFunc.getMockName()).toBe('a mock name');
 
 https://www.jestjs.cn/docs/configuration
 
+### 示例工程
+https://github.com/wangsongc/test-demo/tree/main/jest-js-demo
+
 
 
 ### 测试框架引入遇到的问题
@@ -920,7 +923,3 @@ describe('xxxx', () => {
 ```
 jest.spyOn(window, 'alert').mockReturnValue();
 ```
-
-
-
-

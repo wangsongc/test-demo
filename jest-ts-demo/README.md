@@ -1,8 +1,13 @@
 ## 测试ts
 ### 安装jest
+```
 npm install --save-dev jest typescript ts-jest ts-node babel-jest @babel/core @babel/preset-env
+```
+### 生成jest,ts配置文件
+```
 jest --init
 tsc --init
+```
 
 ### 创建 sum.ts
 ./src/sum.ts

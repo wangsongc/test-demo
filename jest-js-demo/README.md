@@ -1,7 +1,12 @@
 ## 测试js
 ### 安装jest
+```
 npm install --save-dev jest
+```
+### 生成jest配置文件jest.config.js
+```
 jest --init
+```
 
 ### 创建 sum.ts
 ./src/sum.js
